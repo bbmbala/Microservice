@@ -1,0 +1,68 @@
+package com.bala.reviems.review.impl;
+
+
+import com.bala.reviems.review.Review;
+import com.bala.reviems.review.ReviewRepository;
+import com.bala.reviems.review.ReviewService;
+import com.bala.reviems.review.dto.ReviewMessage;
+import com.bala.reviems.review.messaging.ReviewMessageProducer;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class ReviewServiceImpl implements ReviewService {
+    private final ReviewRepository reviewRepository;
+
+
+    public ReviewServiceImpl(ReviewRepository reviewRepository) {
+        this.reviewRepository = reviewRepository;
+
+    }
+
+    @Override
+    public List<Review> getAllReviews(Long companyId) {
+        List<Review> reviews = reviewRepository.findByCompanyId(companyId);
+        return reviews;
+    }
+
+    @Override
+    public boolean addReview(Long companyId, Review review) {
+        if (companyId != null){
+            review.setCompanyId(companyId);
+            reviewRepository.save(review);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public Review getReview(Long reviewId) {
+        return reviewRepository.findById(reviewId).orElse(null);
+    }
+
+    @Override
+    public boolean updateReview(Long reviewId, Review updatedReview) {
+        Review review=reviewRepository.findById(reviewId).orElse(null);
+        if (review!= null){
+            review.setTitle(updatedReview.getTitle());
+            review.setDescription(updatedReview.getDescription());
+            review.setRating(updatedReview.getRating());
+            review.setCompanyId(updatedReview.getCompanyId());
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteReview(Long reviewId) {
+        if (reviewRepository.existsById(reviewId)){
+            reviewRepository.deleteById(reviewId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
